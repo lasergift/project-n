@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem; // Indispensable pour le nouveau système
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -8,7 +9,7 @@ public class PlayerMovement : MonoBehaviour
     public Transform groundCheck;
 
     private Rigidbody2D rb;
-    private float horizontalInput;
+    private float moveInput;
     private bool isGrounded;
 
     void Start()
@@ -16,24 +17,28 @@ public class PlayerMovement : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
     }
 
-    void Update()
+    // Cette fonction est appelée par le composant "Player Input"
+    public void OnMove(InputValue value)
     {
-        // 1. Récupérer les entrées clavier (Flèches ou Q/D)
-        horizontalInput = Input.GetAxisRaw("Horizontal");
+        moveInput = value.Get<Vector2>().x;
+    }
 
-        // 2. Détecter si le joueur touche le sol
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, 0.2f, groundLayer);
-
-        // 3. Sauter
-        if (Input.GetButtonDown("Jump") && isGrounded)
+    // Cette fonction est appelée quand on appuie sur le bouton de saut
+    public void OnJump(InputValue value)
+    {
+        if (value.isPressed && isGrounded)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
         }
     }
 
+    void Update()
+    {
+        isGrounded = Physics2D.OverlapCircle(groundCheck.position, 0.2f, groundLayer);
+    }
+
     void FixedUpdate()
     {
-        // 4. Appliquer le mouvement horizontal
-        rb.linearVelocity = new Vector2(horizontalInput * moveSpeed, rb.linearVelocity.y);
+        rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y);
     }
 }
