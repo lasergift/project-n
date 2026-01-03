@@ -135,6 +135,7 @@ GameObject:
   - component: {fileID: 144627294}
   - component: {fileID: 144627296}
   - component: {fileID: 144627297}
+  - component: {fileID: 144627298}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -399,6 +400,24 @@ CapsuleCollider2D:
   m_Offset: {x: 0.13538074, y: -1.4756486}
   m_Size: {x: 2.3681674, y: 5.0487027}
   m_Direction: 0
+--- !u!114 &144627298
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 144627288}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92a0bbb4a8b28564194213e97e3d627f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FireflyEffect
+  maxParticles: 20
+  spawnRadius: 2
+  fireflyColor: {r: 1, g: 0.9, b: 0.5, a: 1}
+  minSize: 0.15
+  maxSize: 0.25
+  glowIntensity: 2
 --- !u!1 &192666465
 GameObject:
   m_ObjectHideFlags: 0
@@ -3312,6 +3331,55 @@ TilemapCollider2D:
   m_MaximumTileChangeCount: 1000
   m_ExtrusionFactor: 0
   m_UseDelaunayMesh: 0
+--- !u!1 &385902752
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 385902754}
+  - component: {fileID: 385902753}
+  m_Layer: 0
+  m_Name: Global Volume
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &385902753
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 385902752}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.Volume
+  m_IsGlobal: 1
+  priority: 0
+  blendDistance: 0
+  weight: 1
+  sharedProfile: {fileID: 11400000, guid: 4290241ed7d73c04f8f282401e49586c, type: 2}
+--- !u!4 &385902754
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 385902752}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 6.3155775, y: 0.48254395, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -3363,7 +3431,7 @@ MonoBehaviour:
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 0
+  m_RenderPostProcessing: 1
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0
@@ -3758,3 +3826,4 @@ SceneRoots:
   - {fileID: 144627289}
   - {fileID: 863093159}
   - {fileID: 1421215074}
+  - {fileID: 385902754}
