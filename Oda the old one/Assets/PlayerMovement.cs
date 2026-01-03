@@ -1,13 +1,13 @@
 using UnityEngine;
-using UnityEngine.InputSystem; // Requis pour le nouveau système d'Input
+using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Réglages Mouvement")]
-    public float moveSpeed = 8f;
+    public float walkSpeed = 8f;
+    public float runSpeed = 14f; // Vitesse quand on court
     public float jumpForce = 12f;
-    [Tooltip("Multiplicateur de gravité lors de la chute pour éviter l'effet 'lune'")]
-    public float fallMultiplier = 4f; 
+    public float fallMultiplier = 4f;
 
     [Header("Détection Sol")]
     public LayerMask groundLayer;
@@ -18,6 +18,7 @@ public class PlayerMovement : MonoBehaviour
     private Animator anim;
     private float horizontalInput;
     private bool isGrounded;
+    private bool isRunning; // Pour savoir si Shift est pressé
 
     void Start()
     {
@@ -25,13 +26,18 @@ public class PlayerMovement : MonoBehaviour
         anim = GetComponent<Animator>();
     }
 
-    // Appelée par le composant Player Input (Action 'Move')
     public void OnMove(InputValue value)
     {
         horizontalInput = value.Get<Vector2>().x;
     }
 
-    // Appelée par le composant Player Input (Action 'Jump')
+    // Cette fonction détecte l'appui sur Shift (Action 'Sprint' ou 'Run' dans l'Input System)
+    // Assure-toi d'avoir une action nommée "Sprint" liée à la touche Shift dans ton Input Action Asset
+    public void OnSprint(InputValue value)
+    {
+        isRunning = value.isPressed;
+    }
+
     public void OnJump(InputValue value)
     {
         if (value.isPressed && isGrounded)
@@ -42,57 +48,31 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        // 1. Détection du sol
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
 
-        // 2. Mise à jour de l'Animator
-        UpdateAnimations();
+        // Mise à jour de l'Animator
+        anim.SetBool("isWalking", horizontalInput != 0);
+        anim.SetBool("isRunning", isRunning && horizontalInput != 0); // On court seulement si on bouge
+        anim.SetBool("isGrounded", isGrounded);
 
-        // 3. Gestion du Flip (Miroir)
         FlipCharacter();
     }
 
     void FixedUpdate()
     {
-        // Appliquer le mouvement horizontal
-        rb.linearVelocity = new Vector2(horizontalInput * moveSpeed, rb.linearVelocity.y);
+        // On choisit la vitesse actuelle
+        float currentSpeed = isRunning ? runSpeed : walkSpeed;
+        rb.linearVelocity = new Vector2(horizontalInput * currentSpeed, rb.linearVelocity.y);
 
-        // --- PHYSIQUE DE CHUTE (Gravité augmentée) ---
         if (rb.linearVelocity.y < 0)
         {
-            // On ajoute une force vers le bas quand le joueur tombe
             rb.linearVelocity += Vector2.up * Physics2D.gravity.y * (fallMultiplier - 1) * Time.fixedDeltaTime;
         }
     }
 
-    private void UpdateAnimations()
-    {
-        // Variable pour marcher
-        anim.SetBool("isWalking", horizontalInput != 0);
-        
-        // Variable pour le saut/chute
-        anim.SetBool("isGrounded", isGrounded);
-    }
-
     private void FlipCharacter()
     {
-        if (horizontalInput > 0)
-        {
-            transform.localScale = new Vector3(1, 1, 1);
-        }
-        else if (horizontalInput < 0)
-        {
-            transform.localScale = new Vector3(-1, 1, 1);
-        }
-    }
-
-    // Visualisation de la zone de détection du sol dans l'éditeur (Gizmos)
-    private void OnDrawGizmos()
-    {
-        if (groundCheck != null)
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
-        }
+        if (horizontalInput > 0) transform.localScale = new Vector3(1, 1, 1);
+        else if (horizontalInput < 0) transform.localScale = new Vector3(-1, 1, 1);
     }
 }

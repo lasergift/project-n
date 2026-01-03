@@ -301,12 +301,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 173f6a7d0f2ec07439f822497f78a74a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
-  moveSpeed: 4
+  walkSpeed: 8
+  runSpeed: 14
   jumpForce: 10
+  fallMultiplier: 6
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
   groundCheck: {fileID: 1071901498}
+  groundCheckRadius: 0.2
 --- !u!114 &144627294
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3390,7 +3393,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0.3010413, g: 0.33438897, b: 0.38679248, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
