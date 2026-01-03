@@ -1,12 +1,18 @@
 using UnityEngine;
-using UnityEngine.InputSystem; // Obligatoire pour le nouveau système
+using UnityEngine.InputSystem; // Requis pour le nouveau système d'Input
 
 public class PlayerMovement : MonoBehaviour
 {
+    [Header("Réglages Mouvement")]
     public float moveSpeed = 8f;
     public float jumpForce = 12f;
+    [Tooltip("Multiplicateur de gravité lors de la chute pour éviter l'effet 'lune'")]
+    public float fallMultiplier = 4f; 
+
+    [Header("Détection Sol")]
     public LayerMask groundLayer;
     public Transform groundCheck;
+    public float groundCheckRadius = 0.2f;
 
     private Rigidbody2D rb;
     private Animator anim;
@@ -19,14 +25,13 @@ public class PlayerMovement : MonoBehaviour
         anim = GetComponent<Animator>();
     }
 
-    // Cette fonction est appelée automatiquement par le composant Player Input
+    // Appelée par le composant Player Input (Action 'Move')
     public void OnMove(InputValue value)
     {
-        // Récupère la direction (gauche/droite)
         horizontalInput = value.Get<Vector2>().x;
     }
 
-    // Cette fonction est appelée quand on appuie sur le bouton de saut (Espace)
+    // Appelée par le composant Player Input (Action 'Jump')
     public void OnJump(InputValue value)
     {
         if (value.isPressed && isGrounded)
@@ -37,23 +42,57 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        // Logique de détection du sol
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, 0.2f, groundLayer);
+        // 1. Détection du sol
+        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
 
-        // Mise à jour de l'animation
-        bool walking = horizontalInput != 0;
-        anim.SetBool("isWalking", walking);
+        // 2. Mise à jour de l'Animator
+        UpdateAnimations();
 
-        // Logique du Flip (Miroir)
-        if (horizontalInput > 0)
-            transform.localScale = new Vector3(1, 1, 1);
-        else if (horizontalInput < 0)
-            transform.localScale = new Vector3(-1, 1, 1);
+        // 3. Gestion du Flip (Miroir)
+        FlipCharacter();
     }
 
     void FixedUpdate()
     {
-        // Application du mouvement physique
+        // Appliquer le mouvement horizontal
         rb.linearVelocity = new Vector2(horizontalInput * moveSpeed, rb.linearVelocity.y);
+
+        // --- PHYSIQUE DE CHUTE (Gravité augmentée) ---
+        if (rb.linearVelocity.y < 0)
+        {
+            // On ajoute une force vers le bas quand le joueur tombe
+            rb.linearVelocity += Vector2.up * Physics2D.gravity.y * (fallMultiplier - 1) * Time.fixedDeltaTime;
+        }
+    }
+
+    private void UpdateAnimations()
+    {
+        // Variable pour marcher
+        anim.SetBool("isWalking", horizontalInput != 0);
+        
+        // Variable pour le saut/chute
+        anim.SetBool("isGrounded", isGrounded);
+    }
+
+    private void FlipCharacter()
+    {
+        if (horizontalInput > 0)
+        {
+            transform.localScale = new Vector3(1, 1, 1);
+        }
+        else if (horizontalInput < 0)
+        {
+            transform.localScale = new Vector3(-1, 1, 1);
+        }
+    }
+
+    // Visualisation de la zone de détection du sol dans l'éditeur (Gizmos)
+    private void OnDrawGizmos()
+    {
+        if (groundCheck != null)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
+        }
     }
 }
