@@ -305,6 +305,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   walkSpeed: 8
   runSpeed: 14
+  transitionDamp: 10
   jumpHeight: 12
   timeToApex: 1
   fallMultiplier: 8

@@ -6,6 +6,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("Movement Settings")]
     public float walkSpeed = 8f;
     public float runSpeed = 14f;
+    public float transitionDamp = 3f;
 
     [Header("Jump Settings (Height & Time Based)")]
     [Tooltip("Maximum height reached by the jump")]
@@ -83,11 +84,13 @@ public class PlayerMovement : MonoBehaviour
         // 3. Handle character flip
         FlipCharacter();
     }
-
+    float currentSpeed = 0f;
     void FixedUpdate()
     {
         // Choose speed based on sprint state
-        float currentSpeed = isRunning ? runSpeed : walkSpeed;
+        float targetSpeed = isRunning ? runSpeed : walkSpeed;
+        
+        currentSpeed = Mathf.Lerp(currentSpeed, targetSpeed, transitionDamp * Time.deltaTime);
 
         // Apply horizontal movement only when grounded
         if (isGrounded)
