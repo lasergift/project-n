@@ -1,16 +1,23 @@
 using UnityEngine;
-using UnityEngine.InputSystem; // Requis pour le nouveau système d'Input
+using UnityEngine.InputSystem; // Required for the new Input System
 
 public class PlayerMovement : MonoBehaviour
 {
-    [Header("Réglages Mouvement")]
+    [Header("Movement Settings")]
     public float walkSpeed = 8f;
     public float runSpeed = 14f;
-    public float jumpForce = 12f;
-    [Tooltip("Multiplicateur de gravité lors de la chute")]
-    public float fallMultiplier = 4f; 
 
-    [Header("Détection Sol")]
+    [Header("Jump Settings (Height & Time Based)")]
+    [Tooltip("Maximum height reached by the jump")]
+    public float jumpHeight = 3f;
+
+    [Tooltip("Time (in seconds) to reach the top of the jump")]
+    public float timeToApex = 0.4f;
+
+    [Tooltip("Extra gravity multiplier when falling")]
+    public float fallMultiplier = 4f;
+
+    [Header("Ground Detection")]
     public LayerMask groundLayer;
     public Transform groundCheck;
     public float groundCheckRadius = 0.2f;
@@ -21,71 +28,100 @@ public class PlayerMovement : MonoBehaviour
     private bool isGrounded;
     private bool isRunning;
 
+    // Computed jump physics values
+    private float jumpVelocity;
+    private float gravityStrength;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
+        rb.gravityScale = 0f;
+
+        // Compute gravity and initial jump velocity from height & time
+        gravityStrength = -(2f * jumpHeight) / (timeToApex * timeToApex);
+        jumpVelocity = Mathf.Abs(gravityStrength) * timeToApex;
+
+        // Apply custom gravity to the Rigidbody
+        rb.gravityScale = gravityStrength / Physics2D.gravity.y;
     }
 
-    // Détecte le mouvement (touches fléchées / WASD)
+    // Detect horizontal movement (Arrow keys / WASD)
     public void OnMove(InputValue value)
     {
         horizontalInput = value.Get<Vector2>().x;
     }
 
-    // Détecte l'appui ET le relâchement de Shift
+    // Detect sprint press and release (Shift)
     public void OnSprint(InputValue value)
     {
-        // value.isPressed devient faux automatiquement quand on relâche la touche
         isRunning = value.isPressed;
     }
 
-    // Détecte le saut
+    // Detect jump input
     public void OnJump(InputValue value)
     {
         if (value.isPressed && isGrounded)
         {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpVelocity);
+            isGrounded = false;
         }
     }
 
     void Update()
     {
-        // 1. Détection du sol
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
+        // 1. Ground detection
+        isGrounded = Physics2D.OverlapCircle(
+            groundCheck.position,
+            groundCheckRadius,
+            groundLayer
+        );
 
-        // 2. Mise à jour de l'Animator
+        // 2. Update animations
         UpdateAnimations();
 
-        // 3. Gestion du Flip (Miroir)
+        // 3. Handle character flip
         FlipCharacter();
     }
 
     void FixedUpdate()
     {
-        // On choisit la vitesse en fonction de l'état de course
+        // Choose speed based on sprint state
         float currentSpeed = isRunning ? runSpeed : walkSpeed;
-        
-        // Appliquer le mouvement horizontal
-        rb.linearVelocity = new Vector2(horizontalInput * currentSpeed, rb.linearVelocity.y);
 
-        // --- PHYSIQUE DE CHUTE ---
+        // Apply horizontal movement only when grounded
+        if (isGrounded)
+        {
+            rb.linearVelocity = new Vector2(
+                horizontalInput * currentSpeed,
+                rb.linearVelocity.y
+            );
+        }
+        // Apply custom gravity based on jump timing
+        float gravityThisFrame = gravityStrength;
+
+        // Increase gravity when falling for snappier descent
         if (rb.linearVelocity.y < 0)
         {
-            rb.linearVelocity += Vector2.up * Physics2D.gravity.y * (fallMultiplier - 1) * Time.fixedDeltaTime;
+            gravityThisFrame *= fallMultiplier * Time.fixedDeltaTime;
         }
+
+        // Apply gravity manually
+        rb.linearVelocity += Vector2.up *
+                             gravityThisFrame *
+                             Time.fixedDeltaTime;
+
     }
 
     private void UpdateAnimations()
     {
-        // On marche si on bouge
+        // Walking state
         anim.SetBool("isWalking", horizontalInput != 0);
-        
-        // On court SEULEMENT si Shift est pressé ET qu'on bouge
-        // Cela règle le problème du perso qui court sur place ou redémarre en run
+
+        // Running only if sprinting AND moving
         anim.SetBool("isRunning", isRunning && horizontalInput != 0);
-        
-        // État du sol
+
+        // Grounded state
         anim.SetBool("isGrounded", isGrounded);
     }
 
