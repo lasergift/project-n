@@ -1,8 +1,56 @@
 using UnityEngine;
 using UnityEngine.InputSystem; // Required for the new Input System
-
+using System.Collections;
 public class PlayerMovement : MonoBehaviour
 {
+[Header("Combat Combo")]
+public bool isAttacking = false;
+private int comboStep = 0; // 0 = Idle, 1 = Attaque 1, etc.
+private float lastClickTime;
+public float comboDelay = 0.5f; // Temps max entre deux clics pour continuer le combo
+
+public void OnAttack(InputValue value)
+{
+    if (value.isPressed && isGrounded && !isAttacking)
+    {
+        // On calcule le temps depuis la dernière attaque
+        float timeSinceLastClick = Time.time - lastClickTime;
+
+        if (timeSinceLastClick <= comboDelay)
+        {
+            comboStep++;
+            if (comboStep > 3) comboStep = 1; // Recommence après la 3ème
+        }
+        else
+        {
+            comboStep = 1; // Trop lent, on recommence à 1
+        }
+
+        lastClickTime = Time.time;
+        StartCoroutine(PerformAttack());
+    }
+}
+
+private IEnumerator PerformAttack()
+{
+    isAttacking = true;
+
+    // On envoie les infos à l'animator
+    anim.SetInteger("attackIndex", comboStep);
+    anim.SetTrigger("attack");
+    // Ajoute ça juste après anim.SetTrigger
+    float dashForce = 3f;
+    rb.AddForce(new Vector2(transform.localScale.x * dashForce, 0), ForceMode2D.Impulse);
+    // On stop le mouvement pendant l'animation
+    Vector2 originalVelocity = rb.linearVelocity;
+    rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+
+    // Temps d'attente (ajuste selon la vitesse de tes animations)
+    // Plus ce temps est court, plus le combo est nerveux
+    yield return new WaitForSeconds(0.3f); 
+
+    isAttacking = false;
+}
     [Header("Movement Settings")]
     public float walkSpeed = 8f;
     public float runSpeed = 14f;
