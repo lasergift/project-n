@@ -1,0 +1,637 @@
+fileFormatVersion: 2
+guid: e0d3bdf9647a61348a13585321571ae4
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -8517862966277149798
+    second: Samurai Death Ground-Sheet_0
+  - first:
+      213: -3322083751346902249
+    second: Samurai Death Ground-Sheet_1
+  - first:
+      213: -6293027558271949918
+    second: Samurai Death Ground-Sheet_2
+  - first:
+      213: -6992419596287639464
+    second: Samurai Death Ground-Sheet_3
+  - first:
+      213: 8419828693103518819
+    second: Samurai Death Ground-Sheet_4
+  - first:
+      213: 2845253906050698390
+    second: Samurai Death Ground-Sheet_5
+  - first:
+      213: 7687227420836373
+    second: Samurai Death Ground-Sheet_6
+  - first:
+      213: 2825366542974605148
+    second: Samurai Death Ground-Sheet_7
+  - first:
+      213: -4834664489519709621
+    second: Samurai Death Ground-Sheet_8
+  - first:
+      213: -7456767555875488054
+    second: Samurai Death Ground-Sheet_9
+  - first:
+      213: -5130481610229833211
+    second: Samurai Death Ground-Sheet_10
+  - first:
+      213: -1716506514304283064
+    second: Samurai Death Ground-Sheet_11
+  - first:
+      213: -7658671993381095404
+    second: Samurai Death Ground-Sheet_12
+  - first:
+      213: 2858149072592247203
+    second: Samurai Death Ground-Sheet_13
+  - first:
+      213: 8066073123503605834
+    second: Samurai Death Ground-Sheet_14
+  - first:
+      213: 2752670990530202716
+    second: Samurai Death Ground-Sheet_15
+  - first:
+      213: 28880831677371125
+    second: Samurai Death Ground-Sheet_16
+  - first:
+      213: 6792040076434823893
+    second: Samurai Death Ground-Sheet_17
+  - first:
+      213: -5849094868578853297
+    second: Samurai Death Ground-Sheet_18
+  - first:
+      213: -5595009802913718164
+    second: Samurai Death Ground-Sheet_19
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 32
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Samurai Death Ground-Sheet_0
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 15
+        width: 22
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a9b689103c87ac980800000000000000
+      internalID: -8517862966277149798
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Samurai Death Ground-Sheet_1
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 15
+        width: 22
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 71beed6ed6695e1d0800000000000000
+      internalID: -3322083751346902249
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Samurai Death Ground-Sheet_2
+      rect:
+        serializedVersion: 2
+        x: 158
+        y: 15
+        width: 22
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2a3e47317ccaaa8a0800000000000000
+      internalID: -6293027558271949918
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Samurai Death Ground-Sheet_3
+      rect:
+        serializedVersion: 2
+        x: 210
+        y: 15
+        width: 28
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8508bc2bc6fe5fe90800000000000000
+      internalID: -6992419596287639464
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Samurai Death Ground-Sheet_4
+      rect:
+        serializedVersion: 2
+        x: 264
+        y: 15
+        width: 46
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 364a312169d39d470800000000000000
+      internalID: 8419828693103518819
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Samurai Death Ground-Sheet_5
+      rect:
+        serializedVersion: 2
+        x: 327
+        y: 15
+        width: 50
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 69cc1fd4a5f5c7720800000000000000
+      internalID: 2845253906050698390
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Samurai Death Ground-Sheet_6
+      rect:
+        serializedVersion: 2
+        x: 391
+        y: 15
+        width: 51
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5120abb1e7f4b1000800000000000000
+      internalID: 7687227420836373
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Samurai Death Ground-Sheet_7
+      rect:
+        serializedVersion: 2
+        x: 466
+        y: 15
+        width: 28
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c575642c6e7b53720800000000000000
+      internalID: 2825366542974605148
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Samurai Death Ground-Sheet_8
+      rect:
+        serializedVersion: 2
+        x: 530
+        y: 15
+        width: 28
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b428bfd0342d7ecb0800000000000000
+      internalID: -4834664489519709621
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Samurai Death Ground-Sheet_9
+      rect:
+        serializedVersion: 2
+        x: 594
+        y: 15
+        width: 28
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ace32636a6d348890800000000000000
+      internalID: -7456767555875488054
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Samurai Death Ground-Sheet_10
+      rect:
+        serializedVersion: 2
+        x: 658
+        y: 15
+        width: 28
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 502a39f682edcc8b0800000000000000
+      internalID: -5130481610229833211
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Samurai Death Ground-Sheet_11
+      rect:
+        serializedVersion: 2
+        x: 722
+        y: 15
+        width: 28
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 84ecf307b6ebd28e0800000000000000
+      internalID: -1716506514304283064
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Samurai Death Ground-Sheet_12
+      rect:
+        serializedVersion: 2
+        x: 786
+        y: 18
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 418794f366ee6b590800000000000000
+      internalID: -7658671993381095404
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Samurai Death Ground-Sheet_13
+      rect:
+        serializedVersion: 2
+        x: 791
+        y: 15
+        width: 11
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3a919fa307f2aa720800000000000000
+      internalID: 2858149072592247203
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Samurai Death Ground-Sheet_14
+      rect:
+        serializedVersion: 2
+        x: 800
+        y: 15
+        width: 13
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a4802ca15c270ff60800000000000000
+      internalID: 8066073123503605834
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Samurai Death Ground-Sheet_15
+      rect:
+        serializedVersion: 2
+        x: 851
+        y: 21
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c5c431e7ea3733620800000000000000
+      internalID: 2752670990530202716
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Samurai Death Ground-Sheet_16
+      rect:
+        serializedVersion: 2
+        x: 857
+        y: 16
+        width: 7
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5f292f0a6fa966000800000000000000
+      internalID: 28880831677371125
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Samurai Death Ground-Sheet_17
+      rect:
+        serializedVersion: 2
+        x: 865
+        y: 16
+        width: 10
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5da5d18b67c224e50800000000000000
+      internalID: 6792040076434823893
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Samurai Death Ground-Sheet_18
+      rect:
+        serializedVersion: 2
+        x: 916
+        y: 18
+        width: 12
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f4e1cc4f437d3dea0800000000000000
+      internalID: -5849094868578853297
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Samurai Death Ground-Sheet_19
+      rect:
+        serializedVersion: 2
+        x: 929
+        y: 19
+        width: 133
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c60ef765a388a52b0800000000000000
+      internalID: -5595009802913718164
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Samurai Death Ground-Sheet_0: -8517862966277149798
+      Samurai Death Ground-Sheet_1: -3322083751346902249
+      Samurai Death Ground-Sheet_10: -5130481610229833211
+      Samurai Death Ground-Sheet_11: -1716506514304283064
+      Samurai Death Ground-Sheet_12: -7658671993381095404
+      Samurai Death Ground-Sheet_13: 2858149072592247203
+      Samurai Death Ground-Sheet_14: 8066073123503605834
+      Samurai Death Ground-Sheet_15: 2752670990530202716
+      Samurai Death Ground-Sheet_16: 28880831677371125
+      Samurai Death Ground-Sheet_17: 6792040076434823893
+      Samurai Death Ground-Sheet_18: -5849094868578853297
+      Samurai Death Ground-Sheet_19: -5595009802913718164
+      Samurai Death Ground-Sheet_2: -6293027558271949918
+      Samurai Death Ground-Sheet_3: -6992419596287639464
+      Samurai Death Ground-Sheet_4: 8419828693103518819
+      Samurai Death Ground-Sheet_5: 2845253906050698390
+      Samurai Death Ground-Sheet_6: 7687227420836373
+      Samurai Death Ground-Sheet_7: 2825366542974605148
+      Samurai Death Ground-Sheet_8: -4834664489519709621
+      Samurai Death Ground-Sheet_9: -7456767555875488054
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -3,6 +3,7 @@ using UnityEngine.InputSystem; // Required for the new Input System
 using System.Collections;
 public class PlayerMovement : MonoBehaviour
 {
+
 [Header("Combat Combo")]
 public bool isAttacking = false;
 private int comboStep = 0; // 0 = Idle, 1 = Attaque 1, etc.
