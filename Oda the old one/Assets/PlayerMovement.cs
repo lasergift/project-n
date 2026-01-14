@@ -7,11 +7,19 @@ public class PlayerMovement : MonoBehaviour
     [Header("Composants")]
     private Rigidbody2D rb;
     private Animator anim;
+    private TrailRenderer trail; // Ajouté pour le rendu de traînée
 
     [Header("Mouvement")]
     public float walkSpeed = 7f; 
     public float jumpForce = 14f;
     private float horizontalInput;
+
+    [Header("Dash (Celeste-like)")]
+    public float dashForce = 20f;
+    public float dashDuration = 0.15f;
+    public float dashCooldown = 1f;
+    private bool canDash = true;
+    private bool isDashing;
 
     [Header("Sol & Effets")]
     public Transform groundCheck;
@@ -29,11 +37,14 @@ public class PlayerMovement : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
+        trail = GetComponent<TrailRenderer>(); // Récupération automatique du Trail Renderer
+        
+        if (trail != null) trail.emitting = false; // Désactivé par défaut
     }
 
     void Update()
     {
-        if (isDead) return;
+        if (isDead || isDashing) return;
 
         CheckGround();
         UpdateAnimations();
@@ -42,7 +53,7 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (isDead) return;
+        if (isDead || isDashing) return;
 
         if (!isAttacking)
         {
@@ -54,16 +65,16 @@ public class PlayerMovement : MonoBehaviour
     {
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
 
-        if (isGrounded && !wasGrounded) {
-            CreateDust();
+        if (isGrounded)
+        {
+            canDash = true; 
+            if (!wasGrounded) CreateDust();
         }
         wasGrounded = isGrounded;
     }
 
-    public void OnMove(InputValue value)
-    {
-        horizontalInput = value.Get<Vector2>().x;
-    }
+    // --- INPUT SYSTEM ---
+    public void OnMove(InputValue value) => horizontalInput = value.Get<Vector2>().x;
 
     public void OnJump(InputValue value)
     {
@@ -71,6 +82,14 @@ public class PlayerMovement : MonoBehaviour
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
             CreateDust();
+        }
+    }
+
+    public void OnDash(InputValue value)
+    {
+        if (value.isPressed && canDash && !isDead)
+        {
+            StartCoroutine(PerformDash());
         }
     }
 
@@ -82,23 +101,40 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    // --- ACTIONS ---
+
+    private IEnumerator PerformDash()
+    {
+        canDash = false;
+        isDashing = true;
+        
+        if (trail != null) trail.emitting = true; // Allume la traînée
+
+        float originalGravity = rb.gravityScale;
+        rb.gravityScale = 0f;
+
+        // Direction inversée pour tes sprites qui regardent à gauche par défaut
+        float dashDirection = -transform.localScale.x; 
+        rb.linearVelocity = new Vector2(dashDirection * dashForce, 0f);
+
+        yield return new WaitForSeconds(dashDuration);
+
+        if (trail != null) trail.emitting = false; // Éteint la traînée
+        
+        rb.gravityScale = originalGravity;
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x * 0.5f, 0f);
+        isDashing = false;
+        
+        yield return new WaitForSeconds(dashCooldown);
+    }
+
     private IEnumerator PerformAttack()
     {
         isAttacking = true;
         anim.SetTrigger("attack");
         rb.linearVelocity = Vector2.zero;
-        
         yield return new WaitForSeconds(0.4f); 
-
         isAttacking = false;
-    }
-
-    public void Die()
-    {
-        if (isDead) return;
-        isDead = true;
-        anim.SetBool("isDead", true);
-        rb.linearVelocity = Vector2.zero;
     }
 
     private void UpdateAnimations()
@@ -107,22 +143,18 @@ public class PlayerMovement : MonoBehaviour
         anim.SetBool("isWalking", walking);
     }
 
-    private void Flip()
-    {
-        if (isAttacking || horizontalInput == 0) return; 
-
-        // Inversion du sens horizontal :
-        // Si tes sprites regardent à GAUCHE par défaut, on met -1 pour aller à DROITE
-        if (horizontalInput > 0) 
-            transform.localScale = new Vector3(-1, 1, 1);
-        else if (horizontalInput < 0) 
-            transform.localScale = new Vector3(1, 1, 1);
-    }
-
     private void CreateDust()
     {
         if (dustPrefab != null) {
             Instantiate(dustPrefab, groundCheck.position, Quaternion.identity);
         }
+    }
+
+    private void Flip()
+    {
+        if (isAttacking || isDashing || horizontalInput == 0) return; 
+
+        if (horizontalInput > 0) transform.localScale = new Vector3(-1, 1, 1);
+        else if (horizontalInput < 0) transform.localScale = new Vector3(1, 1, 1);
     }
 }
