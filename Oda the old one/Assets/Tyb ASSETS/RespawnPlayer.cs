@@ -1,29 +1,41 @@
 using UnityEngine;
-using System.Collections; // <-- CETTE LIGNE MANQUAIT
+using System.Collections;
 
 public class RespawnPlayer : MonoBehaviour
 {
-    public Transform spawnPoint;
-    public SceneFader fader; // Glisse le FadeCanvas ici
+    public SceneFader fader;
     public string playerTag = "Player";
+    public float timeBeforeFade = 1.0f; // Temps pour voir l'anim de mort
 
-    private bool isRespawning = false; // Empêche de lancer le fondu plusieurs fois
+    private bool isRespawning = false;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // On vérifie le tag et on s'assure qu'on n'est pas déjà en train de respawn
         if (collision.CompareTag(playerTag) && !isRespawning)
         {
             isRespawning = true;
-            StartCoroutine(HandleRespawn(collision.transform));
+            PlayerMovement pm = collision.GetComponent<PlayerMovement>();
+            
+            if (pm != null)
+            {
+                StartCoroutine(HandleRespawnSequence(pm));
+            }
         }
     }
 
-    private IEnumerator HandleRespawn(Transform playerTransform)
+    private IEnumerator HandleRespawnSequence(PlayerMovement pm)
     {
-        // On lance le fondu et on attend qu'il finisse
-        // StartCoroutine retourne une instruction d'attente
-        yield return StartCoroutine(fader.FadeOutAndTeleport(playerTransform, spawnPoint.position));
+        // 1. Immobilisation et animation de mort
+        pm.TriggerDeath();
+
+        // 2. On attend un peu pour que le joueur voit son perso mourir
+        yield return new WaitForSeconds(timeBeforeFade);
+
+        // 3. On lance le fondu et la téléportation
+        yield return StartCoroutine(fader.FadeOutAndTeleport(pm.transform, pm.GetRespawnPosition()));
+        
+        // 4. On réactive le joueur (mouvement + anim idle)
+        pm.ResetAfterRespawn();
         
         isRespawning = false;
     }

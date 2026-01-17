@@ -7,19 +7,41 @@ public class PlayerMovement : MonoBehaviour
     [Header("Composants")]
     private Rigidbody2D rb;
     private Animator anim;
-    private TrailRenderer trail; // Ajouté pour le rendu de traînée
+    private TrailRenderer trail;
 
     [Header("Mouvement")]
     public float walkSpeed = 7f; 
     public float jumpForce = 14f;
     private float horizontalInput;
 
-    [Header("Dash (Celeste-like)")]
+    [Header("Saut Avancé (Celeste-like)")]
+    public float fallMultiplier = 3f;
+    public float lowJumpMultiplier = 2.5f;
+    public float coyoteTime = 0.15f;
+    private float coyoteTimeCounter;
+    public float jumpBufferTime = 0.15f;
+    private float jumpBufferCounter;
+    private bool isJumpPressed;
+
+    [Header("Wall Jump")]
+    public Transform wallCheck; 
+    public float wallCheckRadius = 0.25f;
+    public float wallSlidingSpeed = 2f; 
+    public Vector2 wallJumpForce = new Vector2(12f, 16f); 
+    public float wallJumpDuration = 0.25f; 
+    private bool isWallSliding;
+    private bool isWallJumping;
+
+    [Header("Dash")]
     public float dashForce = 20f;
     public float dashDuration = 0.15f;
     public float dashCooldown = 1f;
     private bool canDash = true;
     private bool isDashing;
+
+    [Header("Animations & État")]
+    public bool isAttacking;
+    public bool isDead;
 
     [Header("Sol & Effets")]
     public Transform groundCheck;
@@ -29,41 +51,74 @@ public class PlayerMovement : MonoBehaviour
     private bool isGrounded;
     private bool wasGrounded;
 
-    [Header("Combat & État")]
-    public bool isAttacking;
-    public bool isDead;
+    [Header("Système de Respawn & Save")]
+    private Vector2 startPosition; 
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
-        trail = GetComponent<TrailRenderer>(); // Récupération automatique du Trail Renderer
+        trail = GetComponent<TrailRenderer>(); 
         
-        if (trail != null) trail.emitting = false; // Désactivé par défaut
+        // --- CHARGEMENT DE LA SAUVEGARDE ---
+        int currentSlot = PlayerPrefs.GetInt("CurrentSlot", 0);
+        PlayerData data = SaveSystem.Load(currentSlot);
+
+        if (data != null)
+        {
+            Vector2 savedPos = new Vector2(data.x, data.y);
+            
+            // On force la position sur le Transform ET le Rigidbody
+            transform.position = savedPos;
+            if (rb != null) rb.linearVelocity = Vector2.zero; // Stop tout mouvement résiduel
+            
+            startPosition = savedPos;
+            Debug.Log("<color=green>Position chargée avec succès du Slot " + currentSlot + " : " + savedPos + "</color>");
+        }
+        else
+        {
+            startPosition = transform.position;
+            Debug.Log("Aucune sauvegarde trouvée, position par défaut.");
+        }
+
+        if (trail != null) trail.emitting = false;
     }
 
     void Update()
     {
         if (isDead || isDashing) return;
 
-        CheckGround();
+        CheckSurroundings();
+        HandleWallSliding();
+        HandleBuffers();
         UpdateAnimations();
-        Flip();
+        
+        if (!isWallJumping && !isWallSliding) Flip();
+
+        if (jumpBufferCounter > 0f)
+        {
+            if (coyoteTimeCounter > 0f && !isAttacking) PerformJump();
+            else if (isWallSliding) StartCoroutine(PerformWallJump());
+        }
     }
 
     void FixedUpdate()
     {
-        if (isDead || isDashing) return;
+        if (isDead || isDashing || isWallJumping) return;
 
         if (!isAttacking)
         {
             rb.linearVelocity = new Vector2(horizontalInput * walkSpeed, rb.linearVelocity.y);
         }
+
+        ApplyBetterJumpPhysics();
     }
 
-    private void CheckGround()
+    private void CheckSurroundings()
     {
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
+        bool isTouchingWall = Physics2D.OverlapCircle(wallCheck.position, wallCheckRadius, groundLayer);
+        isWallSliding = isTouchingWall && !isGrounded && rb.linearVelocity.y < 0;
 
         if (isGrounded)
         {
@@ -73,88 +128,120 @@ public class PlayerMovement : MonoBehaviour
         wasGrounded = isGrounded;
     }
 
-    // --- INPUT SYSTEM ---
-    public void OnMove(InputValue value) => horizontalInput = value.Get<Vector2>().x;
-
-    public void OnJump(InputValue value)
+    private void HandleWallSliding()
     {
-        if (value.isPressed && isGrounded && !isAttacking && !isDead)
+        if (isWallSliding)
         {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
-            CreateDust();
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, Mathf.Clamp(rb.linearVelocity.y, -wallSlidingSpeed, float.MaxValue));
         }
     }
 
-    public void OnDash(InputValue value)
+    private void HandleBuffers()
     {
-        if (value.isPressed && canDash && !isDead)
-        {
-            StartCoroutine(PerformDash());
-        }
+        if (isGrounded) coyoteTimeCounter = coyoteTime;
+        else coyoteTimeCounter -= Time.deltaTime;
+
+        jumpBufferCounter -= Time.deltaTime;
     }
 
-    public void OnAttack(InputValue value)
+    private void ApplyBetterJumpPhysics()
     {
-        if (value.isPressed && isGrounded && !isAttacking && !isDead)
-        {
-            StartCoroutine(PerformAttack());
-        }
+        if (rb.linearVelocity.y < 0)
+            rb.linearVelocity += Vector2.up * Physics2D.gravity.y * (fallMultiplier - 1) * Time.fixedDeltaTime;
+        else if (rb.linearVelocity.y > 0 && !isJumpPressed)
+            rb.linearVelocity += Vector2.up * Physics2D.gravity.y * (lowJumpMultiplier - 1) * Time.fixedDeltaTime;
     }
 
-    // --- ACTIONS ---
+    private void PerformJump()
+    {
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+        jumpBufferCounter = 0f;
+        coyoteTimeCounter = 0f;
+        CreateDust();
+    }
+
+    private IEnumerator PerformWallJump()
+    {
+        isWallJumping = true;
+        jumpBufferCounter = 0f;
+        coyoteTimeCounter = 0f;
+
+        float jumpDir = transform.localScale.x; 
+        transform.localScale = new Vector3(-transform.localScale.x, 1, 1);
+        rb.linearVelocity = new Vector2(jumpDir * wallJumpForce.x, wallJumpForce.y);
+
+        yield return new WaitForSeconds(wallJumpDuration);
+        isWallJumping = false;
+    }
 
     private IEnumerator PerformDash()
     {
-        canDash = false;
+        canDash = false; 
         isDashing = true;
-        
-        if (trail != null) trail.emitting = true; // Allume la traînée
+        if (trail != null) trail.emitting = true;
 
         float originalGravity = rb.gravityScale;
         rb.gravityScale = 0f;
-
-        // Direction inversée pour tes sprites qui regardent à gauche par défaut
         float dashDirection = -transform.localScale.x; 
         rb.linearVelocity = new Vector2(dashDirection * dashForce, 0f);
 
         yield return new WaitForSeconds(dashDuration);
 
-        if (trail != null) trail.emitting = false; // Éteint la traînée
-        
+        if (trail != null) trail.emitting = false;
         rb.gravityScale = originalGravity;
         rb.linearVelocity = new Vector2(rb.linearVelocity.x * 0.5f, 0f);
         isDashing = false;
-        
         yield return new WaitForSeconds(dashCooldown);
     }
 
-    private IEnumerator PerformAttack()
+    // --- INTERFACE POUR LE FALL DETECTOR ET CHECKPOINTS ---
+
+    public void UpdateCheckpoint(Vector2 newPos)
     {
-        isAttacking = true;
-        anim.SetTrigger("attack");
+        startPosition = newPos;
+    }
+
+    public Vector2 GetRespawnPosition()
+    {
+        return startPosition;
+    }
+
+    public void TriggerDeath()
+    {
+        if (isDead) return;
+        isDead = true;
         rb.linearVelocity = Vector2.zero;
-        yield return new WaitForSeconds(0.4f); 
-        isAttacking = false;
+        rb.bodyType = RigidbodyType2D.Static;
+        anim.SetBool("isDead", true);
     }
 
-    private void UpdateAnimations()
+    public void ResetAfterRespawn()
     {
-        bool walking = Mathf.Abs(horizontalInput) > 0.1f && !isAttacking;
-        anim.SetBool("isWalking", walking);
+        isDead = false;
+        rb.bodyType = RigidbodyType2D.Dynamic;
+        anim.SetBool("isDead", false);
+        anim.Play("Iddle");
     }
 
-    private void CreateDust()
-    {
-        if (dustPrefab != null) {
-            Instantiate(dustPrefab, groundCheck.position, Quaternion.identity);
-        }
+    // --- INPUTS & VISUEL ---
+
+    public void OnMove(InputValue value) => horizontalInput = value.Get<Vector2>().x;
+    public void OnJump(InputValue value) {
+        if (value.isPressed) { jumpBufferCounter = jumpBufferTime; isJumpPressed = true; }
+        else isJumpPressed = false;
+    }
+    public void OnDash(InputValue value) { if (value.isPressed && canDash && !isDead) StartCoroutine(PerformDash()); }
+
+    private void UpdateAnimations() {
+        if (isDead) return;
+        anim.SetBool("isWalking", Mathf.Abs(horizontalInput) > 0.1f && !isAttacking);
     }
 
-    private void Flip()
-    {
-        if (isAttacking || isDashing || horizontalInput == 0) return; 
-
+    private void Flip() {
+        if (isAttacking || isDashing || isDead || horizontalInput == 0) return; 
         if (horizontalInput > 0) transform.localScale = new Vector3(-1, 1, 1);
         else if (horizontalInput < 0) transform.localScale = new Vector3(1, 1, 1);
     }
+
+    private void CreateDust() { if (dustPrefab != null) Instantiate(dustPrefab, groundCheck.position, Quaternion.identity); }
 }
