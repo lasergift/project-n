@@ -14,6 +14,13 @@ public class PlayerMovement : MonoBehaviour
     public float jumpForce = 14f;
     private float horizontalInput;
 
+    [Header("Sons")]
+public AudioSource audioSource; // Le composant qui joue le son
+public AudioClip deathSound;    // Le fichier audio du cri/bruit de mort
+
+// ... (reste du script) ...
+
+
     [Header("Saut Avancé (Celeste-like)")]
     public float fallMultiplier = 3f;
     public float lowJumpMultiplier = 2.5f;
@@ -200,14 +207,23 @@ public class PlayerMovement : MonoBehaviour
     public void UpdateCheckpoint(Vector2 newPos) => startPosition = newPos;
     public Vector2 GetRespawnPosition() => startPosition;
 
+
     public void TriggerDeath()
+{
+    if (isDead) return;
+    isDead = true;
+
+    // --- AJOUT DU SON ICI ---
+    if (audioSource != null && deathSound != null)
     {
-        if (isDead) return;
-        isDead = true;
-        rb.linearVelocity = Vector2.zero;
-        rb.bodyType = RigidbodyType2D.Static;
-        anim.SetBool("isDead", true);
+        audioSource.PlayOneShot(deathSound);
     }
+    // ------------------------
+
+    rb.linearVelocity = Vector2.zero;
+    rb.bodyType = RigidbodyType2D.Static;
+    anim.SetBool("isDead", true);
+}
 
     public void ResetAfterRespawn()
     {
