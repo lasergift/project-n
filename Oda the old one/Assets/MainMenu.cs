@@ -45,24 +45,42 @@ public class MainMenu : MonoBehaviour
             else slotTexts[i].text = "Slot " + (i + 1) + " - " + data.lastSceneName;
         }
     }
+    // Ajoute cette fonction dans MainMenu.cs
+public void DeleteSlot(int index)
+{
+    // 1. Supprimer le fichier via le SaveSystem
+    SaveSystem.DeleteSave(index);
+    
+    // 2. Si on supprime le slot sur lequel on jouait, on nettoie le PlayerPrefs
+    if (PlayerPrefs.GetInt("CurrentSlot") == index)
+    {
+        PlayerPrefs.DeleteKey("CurrentSlot");
+    }
+
+    // 3. Mettre à jour l'affichage immédiatement
+    RefreshSlotsVisual();
+    
+    Debug.Log("Sauvegarde du Slot " + index + " supprimée.");
+}
 
     public void SelectSlot(int index)
     {
         PlayerPrefs.SetInt("CurrentSlot", index);
         PlayerData data = SaveSystem.Load(index);
 
-        if (data == null)
-        {
-            PlayerData newData = new PlayerData();
-            newData.slotIndex = index;
-            newData.lastSceneName = "SampleScene"; 
-            SaveSystem.Save(newData, index);
-            SceneManager.LoadScene(newData.lastSceneName);
-        }
-        else
-        {
-            SceneManager.LoadScene(data.lastSceneName);
-        }
+if (data == null)
+{
+    PlayerData newData = new PlayerData();
+    newData.slotIndex = index;
+    newData.lastSceneName = "SampleScene"; 
+    
+    // REMPLACE PAR TES COORDONNÉES RÉELLES (regarde dans l'Inspector de ton Player)
+    newData.x = -25.745f; 
+    newData.y = -2.318f; 
+
+    SaveSystem.Save(newData, index);
+    SceneManager.LoadScene(newData.lastSceneName);
+}
     }
 
     public void QuitGame() => Application.Quit();

@@ -16712,7 +16712,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 385902752}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
   m_Name: 
@@ -21197,10 +21197,13 @@ MonoBehaviour:
   coyoteTime: 0.15
   jumpBufferTime: 0.15
   wallCheck: {fileID: 796049609}
-  wallCheckRadius: 0.2
+  wallCheckRadius: 0.25
   wallSlidingSpeed: 2
-  wallJumpForce: {x: 10, y: 25}
-  wallJumpDuration: 0.2
+  wallJumpForce: {x: 12, y: 16}
+  wallJumpDuration: 0.25
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 64
   dashForce: 20
   dashDuration: 0.15
   dashCooldown: 1
@@ -21208,9 +21211,6 @@ MonoBehaviour:
   isDead: 0
   groundCheck: {fileID: 366663532}
   groundCheckRadius: 0.2
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 64
   dustPrefab: {fileID: 0}
 --- !u!114 &1586634129
 MonoBehaviour:

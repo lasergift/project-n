@@ -23,12 +23,13 @@ public class PlayerMovement : MonoBehaviour
     private float jumpBufferCounter;
     private bool isJumpPressed;
 
-    [Header("Wall Jump")]
+    [Header("Wall Jump & Slide")]
     public Transform wallCheck; 
     public float wallCheckRadius = 0.25f;
     public float wallSlidingSpeed = 2f; 
     public Vector2 wallJumpForce = new Vector2(12f, 16f); 
     public float wallJumpDuration = 0.25f; 
+    public LayerMask groundLayer; // Utilisé aussi pour les murs ici
     private bool isWallSliding;
     private bool isWallJumping;
 
@@ -46,7 +47,6 @@ public class PlayerMovement : MonoBehaviour
     [Header("Sol & Effets")]
     public Transform groundCheck;
     public float groundCheckRadius = 0.2f;
-    public LayerMask groundLayer;
     public GameObject dustPrefab;
     private bool isGrounded;
     private bool wasGrounded;
@@ -59,26 +59,21 @@ public class PlayerMovement : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         trail = GetComponent<TrailRenderer>(); 
-        
-        // --- CHARGEMENT DE LA SAUVEGARDE ---
+
+        // Chargement de la position sauvegardée
         int currentSlot = PlayerPrefs.GetInt("CurrentSlot", 0);
         PlayerData data = SaveSystem.Load(currentSlot);
 
-        if (data != null)
+        if (data != null && data.x != -999f)
         {
             Vector2 savedPos = new Vector2(data.x, data.y);
-            
-            // On force la position sur le Transform ET le Rigidbody
             transform.position = savedPos;
-            if (rb != null) rb.linearVelocity = Vector2.zero; // Stop tout mouvement résiduel
-            
+            if (rb != null) rb.position = savedPos;
             startPosition = savedPos;
-            Debug.Log("<color=green>Position chargée avec succès du Slot " + currentSlot + " : " + savedPos + "</color>");
         }
         else
         {
             startPosition = transform.position;
-            Debug.Log("Aucune sauvegarde trouvée, position par défaut.");
         }
 
         if (trail != null) trail.emitting = false;
@@ -95,6 +90,7 @@ public class PlayerMovement : MonoBehaviour
         
         if (!isWallJumping && !isWallSliding) Flip();
 
+        // Logique de saut combinée (Sol + Wall Jump)
         if (jumpBufferCounter > 0f)
         {
             if (coyoteTimeCounter > 0f && !isAttacking) PerformJump();
@@ -118,6 +114,8 @@ public class PlayerMovement : MonoBehaviour
     {
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
         bool isTouchingWall = Physics2D.OverlapCircle(wallCheck.position, wallCheckRadius, groundLayer);
+        
+        // On glisse si on touche un mur, qu'on n'est pas au sol et qu'on descend
         isWallSliding = isTouchingWall && !isGrounded && rb.linearVelocity.y < 0;
 
         if (isGrounded)
@@ -166,6 +164,7 @@ public class PlayerMovement : MonoBehaviour
         jumpBufferCounter = 0f;
         coyoteTimeCounter = 0f;
 
+        // On saute dans la direction opposée à l'échelle X actuelle
         float jumpDir = transform.localScale.x; 
         transform.localScale = new Vector3(-transform.localScale.x, 1, 1);
         rb.linearVelocity = new Vector2(jumpDir * wallJumpForce.x, wallJumpForce.y);
@@ -182,6 +181,8 @@ public class PlayerMovement : MonoBehaviour
 
         float originalGravity = rb.gravityScale;
         rb.gravityScale = 0f;
+        
+        // Direction du dash basée sur l'échelle X
         float dashDirection = -transform.localScale.x; 
         rb.linearVelocity = new Vector2(dashDirection * dashForce, 0f);
 
@@ -194,17 +195,10 @@ public class PlayerMovement : MonoBehaviour
         yield return new WaitForSeconds(dashCooldown);
     }
 
-    // --- INTERFACE POUR LE FALL DETECTOR ET CHECKPOINTS ---
+    // --- INTERFACE EXTERNE (Checkpoint / Mort) ---
 
-    public void UpdateCheckpoint(Vector2 newPos)
-    {
-        startPosition = newPos;
-    }
-
-    public Vector2 GetRespawnPosition()
-    {
-        return startPosition;
-    }
+    public void UpdateCheckpoint(Vector2 newPos) => startPosition = newPos;
+    public Vector2 GetRespawnPosition() => startPosition;
 
     public void TriggerDeath()
     {
@@ -226,22 +220,33 @@ public class PlayerMovement : MonoBehaviour
     // --- INPUTS & VISUEL ---
 
     public void OnMove(InputValue value) => horizontalInput = value.Get<Vector2>().x;
-    public void OnJump(InputValue value) {
+    
+    public void OnJump(InputValue value) 
+    {
         if (value.isPressed) { jumpBufferCounter = jumpBufferTime; isJumpPressed = true; }
         else isJumpPressed = false;
     }
-    public void OnDash(InputValue value) { if (value.isPressed && canDash && !isDead) StartCoroutine(PerformDash()); }
 
-    private void UpdateAnimations() {
+    public void OnDash(InputValue value) 
+    { 
+        if (value.isPressed && canDash && !isDead) StartCoroutine(PerformDash()); 
+    }
+
+    private void UpdateAnimations() 
+    {
         if (isDead) return;
         anim.SetBool("isWalking", Mathf.Abs(horizontalInput) > 0.1f && !isAttacking);
     }
 
-    private void Flip() {
+    private void Flip() 
+    {
         if (isAttacking || isDashing || isDead || horizontalInput == 0) return; 
         if (horizontalInput > 0) transform.localScale = new Vector3(-1, 1, 1);
         else if (horizontalInput < 0) transform.localScale = new Vector3(1, 1, 1);
     }
 
-    private void CreateDust() { if (dustPrefab != null) Instantiate(dustPrefab, groundCheck.position, Quaternion.identity); }
+    private void CreateDust() 
+    { 
+        if (dustPrefab != null) Instantiate(dustPrefab, groundCheck.position, Quaternion.identity); 
+    }
 }
