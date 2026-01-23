@@ -433,10 +433,10 @@ Camera:
   m_LensShift: {x: 0, y: 0}
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0
-    y: 0
-    width: 1
-    height: 1
+    x: -0.25
+    y: -0.18750001
+    width: 0.5
+    height: 0.37500003
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 60
@@ -21323,6 +21323,10 @@ MonoBehaviour:
   jumpForce: 7
   audioSource: {fileID: 1489611236}
   deathSound: {fileID: 8300000, guid: 4c1e7e0e15813e54cbcd8bf2efd04393, type: 3}
+  jumpSound: {fileID: 0}
+  jumpFX: {fileID: 3234584074981126610, guid: 62251bed5e119354a9f94a2d0c27c023, type: 3}
+  landFX: {fileID: 3234584074981126610, guid: d1d31c86556eee9488678ec7ada29daf, type: 3}
+  dustPrefab: {fileID: 0}
   fallMultiplier: 3
   lowJumpMultiplier: 2.5
   coyoteTime: 0.15
@@ -21342,7 +21346,6 @@ MonoBehaviour:
   isDead: 0
   groundCheck: {fileID: 366663532}
   groundCheckRadius: 0.2
-  dustPrefab: {fileID: 0}
 --- !u!114 &1586634129
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -15,11 +15,14 @@ public class PlayerMovement : MonoBehaviour
     private float horizontalInput;
 
     [Header("Sons")]
-public AudioSource audioSource; // Le composant qui joue le son
-public AudioClip deathSound;    // Le fichier audio du cri/bruit de mort
+    public AudioSource audioSource; 
+    public AudioClip deathSound;    
+    public AudioClip jumpSound;     // Optionnel : si tu as un son de saut
 
-// ... (reste du script) ...
-
+    [Header("Effets de Particules")]
+    public GameObject jumpFX;  // Glisse ton prefab JumpFX ici
+    public GameObject landFX;  // Glisse ton prefab LandFX ici
+    public GameObject dustPrefab; // Ton effet de poussière habituel
 
     [Header("Saut Avancé (Celeste-like)")]
     public float fallMultiplier = 3f;
@@ -36,7 +39,7 @@ public AudioClip deathSound;    // Le fichier audio du cri/bruit de mort
     public float wallSlidingSpeed = 2f; 
     public Vector2 wallJumpForce = new Vector2(12f, 16f); 
     public float wallJumpDuration = 0.25f; 
-    public LayerMask groundLayer; // Utilisé aussi pour les murs ici
+    public LayerMask groundLayer; 
     private bool isWallSliding;
     private bool isWallJumping;
 
@@ -51,10 +54,9 @@ public AudioClip deathSound;    // Le fichier audio du cri/bruit de mort
     public bool isAttacking;
     public bool isDead;
 
-    [Header("Sol & Effets")]
+    [Header("Sol & Détection")]
     public Transform groundCheck;
     public float groundCheckRadius = 0.2f;
-    public GameObject dustPrefab;
     private bool isGrounded;
     private bool wasGrounded;
 
@@ -67,7 +69,6 @@ public AudioClip deathSound;    // Le fichier audio du cri/bruit de mort
         anim = GetComponent<Animator>();
         trail = GetComponent<TrailRenderer>(); 
 
-        // Chargement de la position sauvegardée
         int currentSlot = PlayerPrefs.GetInt("CurrentSlot", 0);
         PlayerData data = SaveSystem.Load(currentSlot);
 
@@ -97,7 +98,6 @@ public AudioClip deathSound;    // Le fichier audio du cri/bruit de mort
         
         if (!isWallJumping && !isWallSliding) Flip();
 
-        // Logique de saut combinée (Sol + Wall Jump)
         if (jumpBufferCounter > 0f)
         {
             if (coyoteTimeCounter > 0f && !isAttacking) PerformJump();
@@ -122,14 +122,16 @@ public AudioClip deathSound;    // Le fichier audio du cri/bruit de mort
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
         bool isTouchingWall = Physics2D.OverlapCircle(wallCheck.position, wallCheckRadius, groundLayer);
         
-        // On glisse si on touche un mur, qu'on n'est pas au sol et qu'on descend
         isWallSliding = isTouchingWall && !isGrounded && rb.linearVelocity.y < 0;
 
-        if (isGrounded)
+        // --- LOGIQUE ATTERRISSAGE (LandFX) ---
+        if (isGrounded && !wasGrounded)
         {
             canDash = true; 
-            if (!wasGrounded) CreateDust();
+            CreateFX(landFX); // Particules d'atterrissage
+            if (dustPrefab != null) CreateFX(dustPrefab);
         }
+        
         wasGrounded = isGrounded;
     }
 
@@ -162,7 +164,10 @@ public AudioClip deathSound;    // Le fichier audio du cri/bruit de mort
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
         jumpBufferCounter = 0f;
         coyoteTimeCounter = 0f;
-        CreateDust();
+
+        // --- EFFETS DE SAUT ---
+        CreateFX(jumpFX); 
+        if (audioSource != null && jumpSound != null) audioSource.PlayOneShot(jumpSound);
     }
 
     private IEnumerator PerformWallJump()
@@ -171,10 +176,11 @@ public AudioClip deathSound;    // Le fichier audio du cri/bruit de mort
         jumpBufferCounter = 0f;
         coyoteTimeCounter = 0f;
 
-        // On saute dans la direction opposée à l'échelle X actuelle
         float jumpDir = transform.localScale.x; 
         transform.localScale = new Vector3(-transform.localScale.x, 1, 1);
         rb.linearVelocity = new Vector2(jumpDir * wallJumpForce.x, wallJumpForce.y);
+
+        CreateFX(jumpFX); // On peut aussi mettre l'effet au mur
 
         yield return new WaitForSeconds(wallJumpDuration);
         isWallJumping = false;
@@ -189,7 +195,6 @@ public AudioClip deathSound;    // Le fichier audio du cri/bruit de mort
         float originalGravity = rb.gravityScale;
         rb.gravityScale = 0f;
         
-        // Direction du dash basée sur l'échelle X
         float dashDirection = -transform.localScale.x; 
         rb.linearVelocity = new Vector2(dashDirection * dashForce, 0f);
 
@@ -202,28 +207,31 @@ public AudioClip deathSound;    // Le fichier audio du cri/bruit de mort
         yield return new WaitForSeconds(dashCooldown);
     }
 
-    // --- INTERFACE EXTERNE (Checkpoint / Mort) ---
+    private void CreateFX(GameObject effectPrefab)
+    {
+        if (effectPrefab != null)
+        {
+            Instantiate(effectPrefab, groundCheck.position, Quaternion.identity);
+        }
+    }
 
     public void UpdateCheckpoint(Vector2 newPos) => startPosition = newPos;
     public Vector2 GetRespawnPosition() => startPosition;
 
-
     public void TriggerDeath()
-{
-    if (isDead) return;
-    isDead = true;
-
-    // --- AJOUT DU SON ICI ---
-    if (audioSource != null && deathSound != null)
     {
-        audioSource.PlayOneShot(deathSound);
-    }
-    // ------------------------
+        if (isDead) return;
+        isDead = true;
 
-    rb.linearVelocity = Vector2.zero;
-    rb.bodyType = RigidbodyType2D.Static;
-    anim.SetBool("isDead", true);
-}
+        if (audioSource != null && deathSound != null)
+        {
+            audioSource.PlayOneShot(deathSound);
+        }
+
+        rb.linearVelocity = Vector2.zero;
+        rb.bodyType = RigidbodyType2D.Static;
+        anim.SetBool("isDead", true);
+    }
 
     public void ResetAfterRespawn()
     {
@@ -232,8 +240,6 @@ public AudioClip deathSound;    // Le fichier audio du cri/bruit de mort
         anim.SetBool("isDead", false);
         anim.Play("Iddle");
     }
-
-    // --- INPUTS & VISUEL ---
 
     public void OnMove(InputValue value) => horizontalInput = value.Get<Vector2>().x;
     
@@ -259,10 +265,5 @@ public AudioClip deathSound;    // Le fichier audio du cri/bruit de mort
         if (isAttacking || isDashing || isDead || horizontalInput == 0) return; 
         if (horizontalInput > 0) transform.localScale = new Vector3(-1, 1, 1);
         else if (horizontalInput < 0) transform.localScale = new Vector3(1, 1, 1);
-    }
-
-    private void CreateDust() 
-    { 
-        if (dustPrefab != null) Instantiate(dustPrefab, groundCheck.position, Quaternion.identity); 
     }
 }
