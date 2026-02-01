@@ -59,6 +59,8 @@ public class PlayerMovement : MonoBehaviour
     public float groundCheckRadius = 0.2f;
     private bool isGrounded;
     private bool wasGrounded;
+    private bool isJumping;
+    private bool isFalling;
 
     [Header("Système de Respawn & Save")]
     private Vector2 startPosition; 
@@ -94,6 +96,7 @@ public class PlayerMovement : MonoBehaviour
         CheckSurroundings();
         HandleWallSliding();
         HandleBuffers();
+        UpdateJumpAndFallStates();
         UpdateAnimations();
         
         if (!isWallJumping && !isWallSliding) Flip();
@@ -124,11 +127,12 @@ public class PlayerMovement : MonoBehaviour
         
         isWallSliding = isTouchingWall && !isGrounded && rb.linearVelocity.y < 0;
 
-        // --- LOGIQUE ATTERRISSAGE (LandFX) ---
         if (isGrounded && !wasGrounded)
         {
             canDash = true; 
-            CreateFX(landFX); // Particules d'atterrissage
+            isJumping = false;
+            isFalling = false;
+            CreateFX(landFX);
             if (dustPrefab != null) CreateFX(dustPrefab);
         }
         
@@ -159,13 +163,32 @@ public class PlayerMovement : MonoBehaviour
             rb.linearVelocity += Vector2.up * Physics2D.gravity.y * (lowJumpMultiplier - 1) * Time.fixedDeltaTime;
     }
 
+    private void UpdateJumpAndFallStates()
+    {
+        if (!isGrounded && rb.linearVelocity.y > 0.1f)
+        {
+            isJumping = true;
+            isFalling = false;
+        }
+        else if (!isGrounded && rb.linearVelocity.y < -0.1f)
+        {
+            isJumping = false;
+            isFalling = true;
+        }
+        else if (isGrounded)
+        {
+            isJumping = false;
+            isFalling = false;
+        }
+    }
+
     private void PerformJump()
     {
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
         jumpBufferCounter = 0f;
         coyoteTimeCounter = 0f;
+        isJumping = true;
 
-        // --- EFFETS DE SAUT ---
         CreateFX(jumpFX); 
         if (audioSource != null && jumpSound != null) audioSource.PlayOneShot(jumpSound);
     }
@@ -175,12 +198,13 @@ public class PlayerMovement : MonoBehaviour
         isWallJumping = true;
         jumpBufferCounter = 0f;
         coyoteTimeCounter = 0f;
+        isJumping = true;
 
         float jumpDir = transform.localScale.x; 
         transform.localScale = new Vector3(-transform.localScale.x, 1, 1);
         rb.linearVelocity = new Vector2(jumpDir * wallJumpForce.x, wallJumpForce.y);
 
-        CreateFX(jumpFX); // On peut aussi mettre l'effet au mur
+        CreateFX(jumpFX);
 
         yield return new WaitForSeconds(wallJumpDuration);
         isWallJumping = false;
@@ -257,7 +281,11 @@ public class PlayerMovement : MonoBehaviour
     private void UpdateAnimations() 
     {
         if (isDead) return;
-        anim.SetBool("isWalking", Mathf.Abs(horizontalInput) > 0.1f && !isAttacking);
+        
+        anim.SetBool("isWalking", Mathf.Abs(horizontalInput) > 0.1f && isGrounded && !isAttacking);
+        anim.SetBool("isJumping", isJumping);
+        anim.SetBool("isFalling", isFalling);
+        anim.SetBool("isGrounded", isGrounded);
     }
 
     private void Flip() 
